@@ -49,16 +49,23 @@ async def steering_event(sid, angle):
     if(int(angle) >= 91): # greater than or equal to 91 is left
         raw_capture = PiRGBArray(camera, size=(imageResolution[0], imageResolution[1]))
         camera.capture(raw_capture, format="bgr")
-        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_left_" + angle + ".jpg", process_frame(raw_capture.array))
-        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_left_" + angle + ".jpg", raw_capture.array)
+        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_left_" + angle + ".jpg", process_frame(raw_capture.array))	# edge detection
+        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_left_" + angle + ".jpg", raw_capture.array)	# normal image
         print("Steering val (left):  ", angle)
 		
     if(int(angle) <= 89): # less than or equal to 89 is right
         raw_capture = PiRGBArray(camera, size=(imageResolution[0], imageResolution[1]))
         camera.capture(raw_capture, format="bgr")
-        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_right_" + angle + ".jpg", process_frame(raw_capture.array))
-        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_right_" + angle + ".jpg", raw_capture.array)
+        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_right_" + angle + ".jpg", process_frame(raw_capture.array))	# edge detection
+        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_right_" + angle + ".jpg", raw_capture.array)	# normal image
         print("Steering val (right):  ", angle)
+		
+    if(int(angle) == 90): # 90 is centered
+        raw_capture = PiRGBArray(camera, size=(imageResolution[0], imageResolution[1]))
+        camera.capture(raw_capture, format="bgr")
+        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_steering_centered_" + angle + ".jpg", process_frame(raw_capture.array))	# edge detection
+        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_steering_centered_" + angle + ".jpg", raw_capture.array)	# normal image
+        print("Steering val (centered):  ", angle)
 
 		
 @sio.on('motor_event', namespace='/test')
@@ -67,16 +74,23 @@ async def motor_event(sid, angle):
     if(int(angle) >= 134): # greater than or equal to 134 is forward
         raw_capture = PiRGBArray(camera, size=(imageResolution[0], imageResolution[1]))
         camera.capture(raw_capture, format="bgr")
-        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_forward_" + str(angle) + ".jpg", process_frame(raw_capture.array))
-        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_forward_" + str(angle) + ".jpg", raw_capture.array)
+        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_forward_" + str(angle) + ".jpg", process_frame(raw_capture.array))	# edge detection
+        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_forward_" + str(angle) + ".jpg", raw_capture.array)	# normal image
         print("Motor value (forward): ", angle)
 		
     if(int(angle) <= 132): # less than or equal to 132 is back
         raw_capture = PiRGBArray(camera, size=(imageResolution[0], imageResolution[1]))
         camera.capture(raw_capture, format="bgr")
-        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_back_" + str(angle) + ".jpg", process_frame(raw_capture.array))
-        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_back_" + str(angle) + ".jpg", raw_capture.array)
+        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_back_" + str(angle) + ".jpg", process_frame(raw_capture.array))	# edge detection
+        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_back_" + str(angle) + ".jpg", raw_capture.array)	# normal image
         print("Motor value (back): ", angle)
+		
+    if(int(angle) == 133):  # 133 is centered
+        raw_capture = PiRGBArray(camera, size=(imageResolution[0], imageResolution[1]))
+        camera.capture(raw_capture, format="bgr")
+        cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_motor_centered_" + str(angle) + ".jpg", process_frame(raw_capture.array))	# edge detection
+        #cv2.imwrite("img_cap/" + str(datetime.datetime.utcnow()) + "_motor_centered_" + str(angle) + ".jpg", raw_capture.array)	# normal image
+        print("Motor value (centered): ", angle)
 
 
 def process_frame(original_image):   # detect edges in an image
