@@ -19,7 +19,7 @@
                 var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
                 const gamepad = new Gamepad();  //for controller
                 steering_angle = 90;    //default value for steering
-                motor_angle = 90;       //default value for motor
+                motor_angle = 133;       //default value for motor
 
                 //map values between controller and servos
                 function mapValue(val, low1, high1, low2, high2) {
@@ -32,14 +32,14 @@
                 socket.on('connect', function() {
                     console.log("connected");
                     steering_angle = 90;
-                    motor_angle = 90;
+                    motor_angle = 133;
                     socket.emit('steering_val', steering_angle);
                     socket.emit('motor_val', motor_angle);
                 });
 
                 socket.on('disconnect', function() {
                     steering_angle = 90;
-                    motor_angle = 90;
+                    motor_angle = 133;
                     socket.emit('steering_val', steering_angle);
                     socket.emit('motor_val', motor_angle);
                 });
@@ -59,7 +59,7 @@
                 //hold left stick
                 gamepad.on('hold', 'stick_axis_left', e => {
                     stick_lr_val = (`${e.value}`.split(',')[0]);
-                    current_stick_value = mapValue(stick_lr_val, -1, 1, 180, 0)
+                    current_stick_value = mapValue(stick_lr_val, -1, 1, 120, 60)
                     if(current_stick_value.toFixed(0) != steering_angle) {
                         steering_angle = current_stick_value.toFixed(0);
                         console.log('New steering angle: ' + steering_angle);
@@ -76,7 +76,7 @@
 
                 //hold left shoulder button
                 gamepad.on('hold', 'shoulder_bottom_left', e => {
-                    current_left_shoulder_value = mapValue(`${e.value.toFixed(2)}`, 0, 1, 90, 0)
+                    current_left_shoulder_value = mapValue(`${e.value.toFixed(2)}`, 0, 1, 133, 180)
                     if((current_left_shoulder_value.toFixed(0)) != motor_angle){
                         motor_angle = current_left_shoulder_value.toFixed(0);
                         console.log('New motor angle: ' + motor_angle);
@@ -86,14 +86,14 @@
 
                 //release left shoulder button
                 gamepad.on('release', 'shoulder_bottom_left', () => {
-                    motor_angle = 90;
+                    motor_angle = 133;
                     console.log('New motor angle: ' + motor_angle);
                     socket.emit('motor_event', motor_angle);
                 });
 
                 //hold right shoulder button
                 gamepad.on('hold', 'shoulder_bottom_right', e => {
-                    current_right_shoulder_value = mapValue(`${e.value.toFixed(2)}`, 0, 1, 90, 180)
+					current_right_shoulder_value = mapValue(`${e.value.toFixed(2)}`, 0, 1, 133, 0)
                     if((current_right_shoulder_value.toFixed(0)) != motor_angle){
                         motor_angle = current_right_shoulder_value.toFixed(0);
                         console.log('New motor angle: ' + motor_angle);
@@ -103,7 +103,7 @@
 
                 //release right shoulder button
                 gamepad.on('release', 'shoulder_bottom_right', () => {
-                    motor_angle = 90;
+                    motor_angle = 133;
                     console.log('New motor angle: ' + motor_angle);
                     socket.emit('motor_event', motor_angle);
                 });
