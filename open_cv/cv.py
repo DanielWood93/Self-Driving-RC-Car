@@ -5,44 +5,39 @@ import numpy as np
 
 
 def process_frame(original_image, res):
-    pts = np.array([[(res[1]/2), (res[1]/2)], [400, (res[1]/2)], [res[0], res[1]], [1, res[1]]], np.int32)
-
-    pts = pts.reshape((-1, 1, 2))
-    roi_outline = cv2.polylines(original_image, [pts], True, (255, 255, 0))
-	
-    greyscale_image = cv2.cvtColor(roi_outline, cv2.COLOR_BGR2GRAY)
-    masked_white_image = cv2.inRange(greyscale_image, 200, 255)
-    gaussian_blurred_image = cv2.GaussianBlur(masked_white_image, (5, 5), 0)
-    canny_edges_image = cv2.Canny(gaussian_blurred_image, 50, 150)
-	
-	##region of interest outline
-    top_left = [int(res[0]/2.666666666), int(res[0]/2.666666666)]
-    top_right = [int(res[0]/1.6), int(res[0]/2.666666666)]
+	##define region of interest (bottom half of frame)
+    top_left = [0, int(res[1]/2)]
+    top_right = [int(res[0]), int(res[1]/2)]
     bottom_left = [res[0], res[1]]
     bottom_right = [0, res[1]]
-
-    ## mask image
-    vertices = [np.array([top_left, top_right, bottom_left, bottom_right], dtype=np.int32)]
-    mask = np.zeros_like(canny_edges_image)
-    cv2.fillPoly(mask, vertices, 255)	#draw outline of roi
-
-    #roi_image = cv2.bitwise_and(canny_edges_image, mask)	##roi edges
-    roi_image = cv2.bitwise_and(greyscale_image, mask)  ##greyscale roi
-
-    vertical_car_center_line = cv2.line(roi_image, (320, 360), (320, 640), (255, 0, 255), 1)  # (b,g,r)
-    horizontal_road_line = cv2.line(vertical_car_center_line, (150, 360), (490, 360), (255, 0, 255), 1)  # (b,g,r)
 	
-    result = horizontal_road_line
-    return result
+	##convert original image to greyscale
+    greyscale_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
+	
+	##mask image
+    vertices = [np.array([top_left, top_right, bottom_left, bottom_right], dtype=np.int32)]
+    mask = np.zeros_like(greyscale_image)
+    cv2.fillPoly(mask, vertices, 255)
+    roi_image = cv2.bitwise_and(greyscale_image, mask)
+	
+	##edge detection    
+    masked_white_image = cv2.inRange(roi_image, 200, 255)
+    gaussian_blurred_image = cv2.GaussianBlur(masked_white_image, (5, 5), 0)
+    canny_edges_image = cv2.Canny(gaussian_blurred_image, 50, 150)
+
+	##draw lines on top of image
+    cv2.line(canny_edges_image, (160, 120), (160, 320), (255, 0, 255), 1)  # (b,g,r), horizontal center line
+    cv2.line(canny_edges_image, (0, 120), (320, 120), (255, 0, 255), 1)  # (b,g,r), vertical center line
+	
+    return canny_edges_image
 
 
 def main():
-    #image_resolution = [320, 240]
-    image_resolution = [640, 480]
-	
+	##camera setup
+    image_resolution = [320, 240]	
     camera = PiCamera()
-    camera.resolution = (image_resolution[0], image_resolution[1])  # set resolution of camera
-    camera.framerate = 30  # set framerate of camera
+    camera.resolution = (image_resolution[0], image_resolution[1])
+    camera.framerate = 30  #30fps
     rawCapture = PiRGBArray(camera, size=(image_resolution[0], image_resolution[1]))
 
     ##capture frames from the camera
