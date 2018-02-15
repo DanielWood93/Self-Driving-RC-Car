@@ -23,7 +23,7 @@ def set_angle(channel, angle):
 
 
 async def index(request):
-    with open('index.html') as f:
+    with open('original_index.html') as f:
         return web.Response(text=f.read(), content_type='text/html')
 
 

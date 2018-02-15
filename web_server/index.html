@@ -4,9 +4,9 @@
 		<script type="text/javascript" src="static/gamepad.js"></script>
         <script type="text/javascript" src="static/socket.io.js"></script>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-        <title>Xbox Server</title>
+        <title>Data Collection Server</title>
 
-        Xbox Controller Server
+        Data Collection Server
         </br>
         </br>
         (Press F12)
@@ -63,7 +63,7 @@
                     if(current_stick_value.toFixed(0) != steering_angle) {
                         steering_angle = current_stick_value.toFixed(0);
                         console.log('New steering angle: ' + steering_angle);
-                        socket.emit('steering_event', steering_angle);
+                        socket.emit('movement_event', steering_angle, motor_angle);
                     }
                 });
 
@@ -71,7 +71,7 @@
                 gamepad.on('release', 'stick_axis_left', () => {
                     steering_angle = 90;
                     console.log('New steering angle: ' + steering_angle.toFixed(0));
-                    socket.emit('steering_event', steering_angle.toFixed(0));
+                    socket.emit('movement_event', steering_angle, motor_angle);
                 });
 
                 //hold left shoulder button
@@ -80,7 +80,7 @@
                     if((current_left_shoulder_value.toFixed(0)) != motor_angle){
                         motor_angle = current_left_shoulder_value.toFixed(0);
                         console.log('New motor angle: ' + motor_angle);
-                        socket.emit('motor_event', motor_angle);
+                        socket.emit('movement_event', steering_angle, motor_angle);
                     }
                 });
 
@@ -88,16 +88,16 @@
                 gamepad.on('release', 'shoulder_bottom_left', () => {
                     motor_angle = 133;
                     console.log('New motor angle: ' + motor_angle);
-                    socket.emit('motor_event', motor_angle);
+                    socket.emit('movement_event', steering_angle, motor_angle);
                 });
 
                 //hold right shoulder button
                 gamepad.on('hold', 'shoulder_bottom_right', e => {
-					current_right_shoulder_value = mapValue(`${e.value.toFixed(2)}`, 0, 1, 133, 0)
+                    current_right_shoulder_value = mapValue(`${e.value.toFixed(2)}`, 0, 1, 133, 0);
                     if((current_right_shoulder_value.toFixed(0)) != motor_angle){
                         motor_angle = current_right_shoulder_value.toFixed(0);
                         console.log('New motor angle: ' + motor_angle);
-                        socket.emit('motor_event', motor_angle);
+                        socket.emit('movement_event', steering_angle, motor_angle);
                     }
                 });
 
@@ -105,8 +105,22 @@
                 gamepad.on('release', 'shoulder_bottom_right', () => {
                     motor_angle = 133;
                     console.log('New motor angle: ' + motor_angle);
-                    socket.emit('motor_event', motor_angle);
+                    socket.emit('movement_event',steering_angle, motor_angle);
                 });
+
+
+                //general movement_event
+                gamepad.on('hold', 'movement_event', e => {
+                    stick_lr_val = (`${e.value}`.split(',')[0]);
+                    current_stick_value = mapValue(stick_lr_val, -1, 1, 120, 60)
+                    if(current_stick_value.toFixed(0) != steering_angle) {
+                        steering_angle = current_stick_value.toFixed(0);
+                        console.log('New steering angle: ' + steering_angle);
+                        socket.emit('movement_event', steering_angle, motor_angle);
+                    }
+                });
+
+
             });
         </script>
     </body>
