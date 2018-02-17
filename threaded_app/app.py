@@ -8,7 +8,7 @@ import frame
 
 
 print("Threaded frames from pi camera module")
-stream = frame2.Frame(1 , "ProcessFrame")
+stream = frame.Frame(1 , "ProcessFrame")
 stream.start()
 time.sleep(2.0)
 
