@@ -1,12 +1,10 @@
-from __future__ import print_function
 from picamera.array import PiRGBArray
 from picamera import PiCamera
-import argparse
 import numpy as np
 import threading
 import cv2
 import time
-import frame2
+import frame
 
 
 print("Threaded frames from pi camera module")
