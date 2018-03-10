@@ -1,14 +1,30 @@
+"""frame.py
+process image with masked region of interest image with canny edge detection and center lines drawn
+Example:
+    to use as a module
+    'import frame'
+    or
+    to view processed stream
+    '$ python3 frame.py'
+"""
+
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 from threading import Thread
-import cv2
 import numpy as np
+import cv2
 import time
-import frame
+
 
 class Frame:
     def __init__(self, thread_id, name, resolution=(320, 240), framerate=30):
-        """Initialize pi camera"""
+        """Initialize pi camera settings and begin stream
+        Args:
+            thread_id: id of thread
+            name: name of thread
+            resolution: resolution of camera image, defaults to (320, 240)
+            framerate: framerate of stream, defaults to 30
+        """
         self.thread_id = thread_id
         self.name = name
         self.camera = PiCamera()
@@ -18,13 +34,13 @@ class Frame:
         self.stream = self.camera.capture_continuous(self.rawCapture, format="bgr", use_video_port=True)
         self.frame = None
         self.stopped = False
-        print("ThreadId: {}, Name: {}".format(self.thread_id, self.name))
 
     def start(self):
         Thread(target=self.update, args=()).start()
         return self
 
     def update(self):
+        """Update stream with next frame"""
         for f in self.stream:
             self.frame = f.array
             self.rawCapture.truncate(0)
@@ -35,10 +51,17 @@ class Frame:
                 return
 
     def read(self):
+        """Read and return latest frame from stream"""
         return self.frame
 
     def process(self, original, res):
-        """OpenCV edge detection on frame"""
+        """Define region of interest, convert to greyscale, mask image, canny edge detection, draw lines on image
+        Args:
+            original: image to be processed
+            res: image resolution e.g. (320, 240)
+        Returns:
+            canny_edges: returns masked region of interest image with canny edge detection and center lines drawn
+        """
         # define region of interest (bottom half of frame)
         top_left = [0, int(res[1] / 2)]
         top_right = [int(res[0]), int(res[1] / 2)]
@@ -60,24 +83,32 @@ class Frame:
         cv2.line(canny_edges, (0, 120), (320, 120), (255, 0, 255), 1)  # (b,g,r), vertical center line
         return canny_edges
 
-    def save(self, filename, image):
+    def save_image(self, filename, image):
+        """Save image to file
+        Args:
+            filename: file name to save as
+            image: image to save
+        """
         cv2.imwrite(filename, image)
 
-    def stop(self):
+    def stop_stream(self):
+        """Stop stream"""
         self.stopped = True
 
+
 def main():
-    print("Threaded frames from pi camera module")
     stream = Frame(1, "ProcessFrame")
     stream.start()
     time.sleep(2.0)
     while 1:
         frame = stream.read()
         processed = stream.process(frame, (320, 240))
-        cv2.imshow("Frame", processed)
+        cv2.imshow("Processed Frame", processed)
         cv2.waitKey(1) & 0xFF
     cv2.destroyAllWindows()
-    stream.stop()
+    stream.stop_stream()
+    print("-----END-----")
+    exit()
 
 
 if __name__ == '__main__':
