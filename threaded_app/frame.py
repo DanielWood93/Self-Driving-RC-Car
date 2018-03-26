@@ -54,33 +54,18 @@ class Frame:
         """Read and return latest frame from stream"""
         return self.frame
 
-    def process(self, original, res):
-        """Define region of interest, convert to greyscale, mask image, canny edge detection, draw lines on image
+    def process(self, original):
+        """Convert to greyscale, mask image, canny edge detection, draw horizontal center line
         Args:
             original: image to be processed
-            res: image resolution e.g. (320, 240)
         Returns:
             canny_edges: returns masked region of interest image with canny edge detection and center lines drawn
         """
-        # define region of interest (bottom half of frame)
-        top_left = [0, int(res[1] / 2)]
-        top_right = [int(res[0]), int(res[1] / 2)]
-        bottom_left = [res[0], res[1]]
-        bottom_right = [0, res[1]]
-        # convert original image to greyscale
-        greyscale = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-        # mask image
-        vertices = [np.array([top_left, top_right, bottom_left, bottom_right], dtype=np.int32)]
-        mask = np.zeros_like(greyscale)
-        cv2.fillPoly(mask, vertices, 255)
-        roi = cv2.bitwise_and(greyscale, mask)
-        # edge detection
-        masked_white = cv2.inRange(roi, 200, 255)
-        gaussian_blurred = cv2.GaussianBlur(masked_white, (5, 5), 0)
-        canny_edges = cv2.Canny(gaussian_blurred, 50, 150)
-        # draw lines on top of image
-        cv2.line(canny_edges, (160, 120), (160, 320), (255, 0, 255), 1)  # (b,g,r), horizontal center line
-        cv2.line(canny_edges, (0, 120), (320, 120), (255, 0, 255), 1)  # (b,g,r), vertical center line
+        greyscale = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)  # convert to greyscale
+        masked_white = cv2.inRange(greyscale, 200, 255)     # mask white pixels of greyscale image
+        blurred = cv2.GaussianBlur(masked_white, (5, 5), 0)    # apply gaussian blur
+        canny_edges = cv2.Canny(blurred, 50, 150)   # apply canny edge detection
+        cv2.line(canny_edges, (160, 0), (160, 120), (255, 0, 255), 1)  # (b,g,r), horizontal center line
         return canny_edges
 
     def save_image(self, filename, image):
@@ -102,9 +87,12 @@ def main():
     time.sleep(2.0)
     while 1:
         frame = stream.read()
-        processed = stream.process(frame, (320, 240))
-        cv2.imshow("Processed Frame", processed)
+        halved = frame[120:240, 0:320]
+        edges = stream.process(halved)
+        
+        cv2.imshow("Canny Edges", edges)
         cv2.waitKey(1) & 0xFF
+
     cv2.destroyAllWindows()
     stream.stop_stream()
     print("-----END-----")
