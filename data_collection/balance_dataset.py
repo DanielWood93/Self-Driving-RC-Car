@@ -1,41 +1,54 @@
+"""balance_dataset.py
+balance dataset to get an equal number of samples in each direction
+"""
+
 import numpy as np
-import pandas as pd
 from random import shuffle
 
-training_data = np.load('../datasets/joined_datasets.npy')
-print('Training data: ', len(training_data))
+dataset = np.load('datasets/sample_dataset.npy')
+print('Samples in dataset: ', len(dataset))
 
-# balance training data to have an equal amount of samples in each direction
+forward_samples = []
+left_samples = []
+right_samples = []
+shuffle(dataset)  # shuffle the samples
 
-forward_only = []
-forward_left = []
-forward_right = []
+# sort each sample by its direction label
+for sample in dataset:
+    image = sample[0]
+    label = sample[1]
+    if label == [0, 1, 0]:  # forward
+        forward_samples.append([image, label])
 
-shuffle(training_data)
+    elif label == [1, 1, 0]:  # left
+        left_samples.append([image, label])
 
-for data in training_data:
-    img = data[0]
-    choice = data[1]
-    if choice == [0, 1, 0]:  # forward only
-        forward_only.append([img, choice])
+    elif label == [0, 1, 1]:  # right
+        right_samples.append([image, label])
 
-    elif choice == [1, 1, 0]:  # forward left
-        forward_left.append([img, choice])
+print('Before balancing')
+print('Forward samples: ', len(forward_samples))
+print('Left samples: ', len(left_samples))
+print('Right samples: ', len(right_samples))
 
-    elif choice == [0, 1, 1]:  # forward right
-        forward_right.append([img, choice])
+shuffle(forward_samples)  # shuffle the samples
+shuffle(left_samples)  # shuffle the samples
+shuffle(right_samples)  # shuffle the samples
 
-forward_only = forward_only[:983]
-forward_left = forward_left[:983]
-forward_right = forward_right[:983]
+# find which direction has lowest number of samples and reduce all directions to that length
+lowest_samples = min(len(forward_samples), len(left_samples), len(right_samples))
+forward_samples = forward_samples[:lowest_samples]
+left_samples = left_samples[:lowest_samples]
+right_samples = right_samples[:lowest_samples]
 
-print('Balanced')
-print('Forward: ', len(forward_only))
-print('Left: ', len(forward_left))
-print('Right: ', len(forward_right))
+print('After balancing')
+print('Forward samples: ', len(forward_samples))
+print('Left samples: ', len(left_samples))
+print('Right samples: ', len(right_samples))
 
-balanced_samples = forward_only + forward_left + forward_right
-print('Total samples: ', len(balanced_samples))
+balanced = forward_samples + left_samples + right_samples
+print('Total samples: ', len(balanced))
 
-np.save('../datasets/balanced_dataset.npy', balanced_samples)
+shuffle(balanced)  # shuffle the samples
+np.save('datasets/balanced_dataset.npy', balanced)  # save to new dataset file
 print('done')
