@@ -16,7 +16,7 @@ import time
 import logging
 
 
-class Frame(Thread):  # try Frame(Thread)
+class Frame(Thread):
     def __init__(self, thread_id, name, resolution=(320, 240), framerate=30):
         """Initialize pi camera settings and begin stream
         Args:
@@ -56,7 +56,6 @@ class Frame(Thread):  # try Frame(Thread)
 
     def read(self):
         """Read and return latest frame from stream"""
-        #logging.info('read')
         return self.frame
 
     def process(self, original):
@@ -66,7 +65,6 @@ class Frame(Thread):  # try Frame(Thread)
         Returns:
             canny_edges: returns masked region of interest image with canny edge detection and center lines drawn
         """
-        #logging.info('process')
         greyscale = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)  # convert to greyscale
         masked_white = cv2.inRange(greyscale, 200, 255)     # mask white pixels of greyscale image
         blurred = cv2.GaussianBlur(masked_white, (5, 5), 0)    # apply gaussian blur
@@ -118,6 +116,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# make a pause thing
