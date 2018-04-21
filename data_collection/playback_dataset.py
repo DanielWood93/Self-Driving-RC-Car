@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-training_data = np.load("dataset.npy")
+training_data = np.load('dataset.npy')
 
 for count, sample in enumerate(training_data):
     frame_data = sample[0]
@@ -11,4 +11,3 @@ for count, sample in enumerate(training_data):
     if cv2.waitKey(1) & 0xFF == ord('q'):
         cv2.destroyAllWindows()
         break
-    # time.sleep(0.5)

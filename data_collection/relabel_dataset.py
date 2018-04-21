@@ -1,7 +1,7 @@
 import numpy as np
 from random import shuffle
 
-to_relabel = np.load("../datasets/rights.npy")
+to_relabel = np.load('../datasets/rights.npy')
 all_data = []
 
 for data in to_relabel:
@@ -9,7 +9,7 @@ for data in to_relabel:
     choice = data[1]
     all_data.append([img, [0,1,1]])
 
-print("Total samples: ", len(all_data))
+print('Total samples: ', len(all_data))
 shuffle(all_data)
 np.save('../datasets/relabeled_rights.npy', all_data)
-print("done")
+print('done')
