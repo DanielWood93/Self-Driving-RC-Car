@@ -48,7 +48,7 @@ class Drive:
 
     def drive_forward(self):
         self.steering_angle = 90
-        self.motor_angle = 125
+        self.motor_angle = 128
         self.set_angle(14, self.steering_angle)  # set angle for motors
         self.set_angle(15, self.motor_angle)  # set angle for motors
 
@@ -70,20 +70,18 @@ def main():
 
     print("Left")
     car.drive_left()
-    time.sleep(2)
+    time.sleep(1)
 
     print("Forward")
     car.drive_forward()
-    time.sleep(2)
+    time.sleep(1)
 
     print("Right")
     car.drive_right()
-    time.sleep(2)
+    time.sleep(1)
 
     print("Stopped")
     car.car_stopped()
-    time.sleep(2)
-
     exit()
 
 
