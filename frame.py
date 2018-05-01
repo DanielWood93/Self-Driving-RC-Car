@@ -1,5 +1,5 @@
 """frame.py
-process image with masked region of interest image with canny edge detection and center lines drawn
+
 Example:
     to use as a module
     'import frame'
@@ -11,24 +11,27 @@ Example:
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 from threading import Thread
-import cv2
+import cv2      # opencv
 import time
 import logging
 
 
 class Frame(Thread):
-    def __init__(self, thread_id, name, resolution=(320, 240), framerate=30):
+    """Process camera images, convert to greyscale canny edge detection and center lines drawn"""
+
+    def __init__(self, thread_id, thread_name, resolution=(320, 240), framerate=30):
         """Initialize pi camera settings and begin stream
+
         Args:
-            thread_id: id of thread
-            name: name of thread
-            resolution: resolution of camera image, defaults to (320, 240)
-            framerate: framerate of stream, defaults to 30
+            thread_id (int): id of thread
+            thread_name (str): name of thread
+            resolution (int, int): (optional) resolution of camera image, (width, height) , defaults to (320, 240)
+            framerate (int): (optional) framerate of stream, defaults to 30
         """
-        logging.info('__init__')
+        logging.info('Frame: __init__')
         super(Frame, self).__init__()
         self.thread_id = thread_id
-        self.name = name
+        self.thread_name = thread_name
         self.camera = PiCamera()
         self.camera.resolution = resolution
         self.camera.framerate = framerate
@@ -38,13 +41,14 @@ class Frame(Thread):
         self.stopped = False
 
     def start(self):
-        logging.info('start')
+        """Start the thread's activity of update method"""
+        logging.info('Frame: start')
         Thread(target=self.update, args=()).start()
         return self
 
     def update(self):
         """Update stream with next frame"""
-        logging.info('update')
+        logging.info('Frame: update')
         for f in self.stream:
             self.frame = f.array
             self.rawCapture.truncate(0)
@@ -59,24 +63,26 @@ class Frame(Thread):
         return self.frame[120:240, 0:320]   # slice image and return lower half of frame
 
     def process(self, original):
-        """Convert to greyscale, mask image, canny edge detection, draw horizontal center line
+        """Convert to greyscale, mask white pixels, gaussian blur, canny edge detection, draw horizontal center line
+
         Args:
-            original: image to be processed
+            original (numpy.ndarray'): image to be processed
         Returns:
-            canny_edges: returns masked region of interest image with canny edge detection and center lines drawn
+            canny_edges(numpy.ndarray'): processed image with edge detection
         """
         greyscale = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)  # convert to greyscale
-        masked_white = cv2.inRange(greyscale, 200, 255)     # mask white pixels of greyscale image
+        masked_white = cv2.inRange(greyscale, 200, 255)     # mask white pixels
         blurred = cv2.GaussianBlur(masked_white, (5, 5), 0)    # apply gaussian blur
         canny_edges = cv2.Canny(blurred, 50, 150)   # apply canny edge detection
-        cv2.line(canny_edges, (160, 0), (160, 120), (255, 0, 255), 1)  # (b,g,r), horizontal center line
+        cv2.line(canny_edges, (160, 0), (160, 120), (255, 0, 255), 1)  # (b,g,r), add horizontal center line
         return canny_edges
 
     def save_image(self, filename, image):
         """Save image to file
+
         Args:
-            filename: file name to save as
-            image: image to save
+            filename (str): file name to save as (e.g. image.jpg)
+            image (numpy.ndarray): image to save
         """
         logging.info('save_image')
         cv2.imwrite(filename, image)
@@ -87,6 +93,7 @@ class Frame(Thread):
         self.stopped = True
 
 
+# for logging
 logging.basicConfig(
     level=logging.INFO,
     format='[%(levelname)s] (%(threadName)-10s) %(message)s',
@@ -98,7 +105,7 @@ def main():
         stream = Frame(1, "ProcessFrame")
         stream.start()
         time.sleep(1)
-        while 1:
+        while True:
             frame = stream.read()
             processed = stream.process(frame)
 

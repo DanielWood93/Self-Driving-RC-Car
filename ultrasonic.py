@@ -1,3 +1,13 @@
+"""ultrasonic.py
+
+Example:
+    to use as a module
+    'import ultrasonic'
+    or
+    to view processed stream
+    '$ python3 ultrasonic.py'
+"""
+
 import RPi.GPIO as GPIO
 from time import sleep, time
 from threading import Thread
@@ -5,11 +15,26 @@ import logging
 
 
 class Ultrasonic(Thread):
-    def __init__(self, thread_id, name, trig_pin, echo_pin):
-        logging.info('__init__')
+    """
+    Setup and use ultrasonic distance sensor to measure distance in cm
+
+    code modified from: https://www.modmypi.com/blog/hc-sr04-ultrasonic-range-sensor-on-the-raspberry-pi
+    into a module with threading
+    """
+
+    def __init__(self, thread_id, thread_name, trig_pin, echo_pin):
+        """Setup GPIO pins to use ultrasonic sensor
+
+        Args:
+            thread_id (int): id of thread
+            thread_name (str): name of thread
+            trig_pin (int): set trigger pin of ultrasonic sensor
+            echo_pin (int): set echo pin of ultrasonic sensor
+        """
+        logging.info('Ultrasonic: __init__')
         super(Ultrasonic, self).__init__()
         self.thread_id = thread_id
-        self.name = name
+        self.name = thread_name
         self.trig = trig_pin
         self.echo = echo_pin
         GPIO.setmode(GPIO.BCM)
@@ -17,12 +42,17 @@ class Ultrasonic(Thread):
         GPIO.setup(self.echo, GPIO.IN)
 
     def start(self):
+        """Start the thread's activity of measure method"""
         logging.info('start')
         Thread(target=self.measure(), args=()).start()
         return self
 
     def measure(self):
-        # logging.info('measure')
+        """Measure distance from ultrasonic sensor
+
+        Returns:
+            distance (float): measured distance in cm
+        """
         GPIO.output(self.trig, GPIO.LOW)
         sleep(0.1)
         GPIO.output(self.trig, GPIO.HIGH)
@@ -39,6 +69,7 @@ class Ultrasonic(Thread):
         return distance
 
 
+# for logging
 logging.basicConfig(
     level=logging.INFO,
     format='[%(levelname)s] (%(threadName)-10s) %(message)s',
