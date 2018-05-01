@@ -6,16 +6,16 @@ Example:
 
 from picamera.array import PiRGBArray  # for pi camera
 from picamera import PiCamera  # for pi camera
-from threading import Thread  # for threading
+from threading import Thread
 from approxeng.input.selectbinder import ControllerResource  # for xbox controller
 from pca9685_driver import Device  # for PCA9685 servo driver
 from time import sleep
-import numpy as np
-import cv2
+import numpy as np  # numpy
+import cv2      # opencv
 import os
 import sys
-sys.path.insert(0, '../')
-import frame  # for image processing
+sys.path.insert(0, '../')   # access my frame module from dir up
+import frame  # my module for image processing
 
 
 class DataCapture(object):
@@ -132,14 +132,13 @@ class DataCapture(object):
         Args:
             img: image which is to be processed with edge detection
         """
-        halved = img[120:240, 0:320]
-        edges = self.stream.process(halved)  # edge detection
+        edges = self.stream.process(img)  # edge detection
         output = [self.left_val, self.forward_val,
                   self.right_val]  # [left, forward, right] update array of controller input data
         self.training_data.append([edges, output])
         print(output)
         cv2.imshow('Data Collection Frame Preview', edges)
-        cv2.waitKey(1)
+        cv2.waitKey(1) & 0xFF
 
     def stop_collection(self):
         """Stop data collection, save dataset, close camera preview, close stream"""

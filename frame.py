@@ -44,7 +44,7 @@ class Frame(Thread):
 
     def update(self):
         """Update stream with next frame"""
-        logging.info('starting self')
+        logging.info('update')
         for f in self.stream:
             self.frame = f.array
             self.rawCapture.truncate(0)
@@ -56,7 +56,7 @@ class Frame(Thread):
 
     def read(self):
         """Read and return latest frame from stream"""
-        return self.frame
+        return self.frame[120:240, 0:320]   # slice image and return lower half of frame
 
     def process(self, original):
         """Convert to greyscale, mask image, canny edge detection, draw horizontal center line
@@ -98,19 +98,17 @@ def main():
         stream = Frame(1, "ProcessFrame")
         stream.start()
         time.sleep(1)
-        logging.info('start loop')
         while 1:
             frame = stream.read()
-            halved = frame[120:240, 0:320]
-            processed = stream.process(halved)
+            processed = stream.process(frame)
 
             cv2.imshow('Processed Frame', processed)
             cv2.waitKey(1) & 0xFF
 
     except KeyboardInterrupt:
         logging.info('KeyboardInterrupt')
-        cv2.destroyAllWindows()
         stream.stop_stream()
+        cv2.destroyAllWindows()
         exit()
 
 
