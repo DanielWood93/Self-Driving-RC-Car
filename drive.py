@@ -54,13 +54,13 @@ class Drive:
 
     def drive_left(self):
         self.steering_angle = 120
-        self.motor_angle = 125
+        self.motor_angle = 128
         self.set_angle(14, self.steering_angle)  # set angle for motors
         self.set_angle(15, self.motor_angle)  # set angle for motors
 
     def drive_right(self):
         self.steering_angle = 60
-        self.motor_angle = 125
+        self.motor_angle = 128
         self.set_angle(14, self.steering_angle)  # set angle for motors
         self.set_angle(15, self.motor_angle)  # set angle for motors
 
