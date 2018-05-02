@@ -37,6 +37,8 @@ class Ultrasonic(Thread):
         self.name = thread_name
         self.trig = trig_pin
         self.echo = echo_pin
+        self.pulse_start = 0
+        self.pulse_end = 0
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.trig, GPIO.OUT)
         GPIO.setup(self.echo, GPIO.IN)
@@ -60,10 +62,10 @@ class Ultrasonic(Thread):
         GPIO.output(self.trig, GPIO.LOW)
 
         while GPIO.input(self.echo) == GPIO.LOW:
-            pulse_start = time()
+            self.pulse_start = time()
         while GPIO.input(self.echo) == GPIO.HIGH:
-            pulse_end = time()
-        pulse_duration = pulse_end - pulse_start
+            self.pulse_end = time()
+        pulse_duration = self.pulse_end - self.pulse_start
         distance = pulse_duration * 17160.5
         distance = round(distance, 2)
         return distance
