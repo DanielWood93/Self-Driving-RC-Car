@@ -3,17 +3,20 @@ BEng (Hons) Computer & Electronic Engineering Final Year Project
 
 
 ### Dependencies
-* Raspberry Pi: 
+* Raspberry Pi:
+  - Python v3.5.3
   - Picamera
-  - OpenCV
-  - Numpy
+  - OpenCV v3.3.1-dev
+  - Numpy v1.14.2
+  - TensorFlow v1.7.0
+  - PCA9685-driver
 * PCA9685 PWM Servo Driver
 * Raspberry Pi Camera Module v2
 
 
 ### About
 - data_collection/
-  - ***dataset_jpg/***: For samples converted to .jpg images
+  - ***dataset_jpg/*** : For samples converted to .jpg images
       - ***forward/***
       - ***left/***
       - ***right/***
@@ -28,17 +31,12 @@ BEng (Hons) Computer & Electronic Engineering Final Year Project
   -	***sort_gui.py***: GUI for viewing, sorting and relableing samples
   -	***sort_gui_support.py***:  GUI for viewing, sorting and relableing samples
 
-- old_code/
-  -	***capture_image.py***: Edge detection
-  - ***data_collection_npy_10_percent.py***: Data collection to npy file in 10% value increments
-  - ***faceDetectStaticImg.py***: Face detection on still images
-  - ***houghLinesStillImage.py***: Edge detection and hough lines on still image
-  - ***houghLinesVideoStream.py***: Edge detection and hough lines on video stream
-  
 - tests/
   -	***drive_with_controller.py***: Test to drive car with Xbox One controller
-  
+
 -	***app.py***: Main app to drive car autonomously
--	***drive.py***: Class for controling direction of car
-- ***frame.py***: Class for camera setup and edge detection image processing
--	***ultrasonic.py***: Class for ultrasonic distance sensor setup and distance measurement
+-	***drive.py***: Module for controling direction of car
+- ***frame.py***: Module for pi camera setup and edge detection image processing
+- ***inception_v3_graph.pb***: Retrained graph, not used in final app.py
+- ***mobilenet_v2_graph.pb***: Retrained graph, used in final app.py
+-	***ultrasonic.py***: Module for ultrasonic distance sensor setup and distance measurement
